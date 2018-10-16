@@ -49,8 +49,8 @@
     <form method="post" action = "{{ url('/main/checklogin') }}">
         {{ csrf_field() }}
         <div class="form-group">
-            <label>Enter Email: </label>
-            <input type="email" name="email" class="form-control"/>
+            <label>Enter Username: </label>
+            <input type="text" name="username" class="form-control"/>
         </div>
         <div class="form-group">
             <label>Enter Password: </label>

@@ -19,16 +19,12 @@
 <div class="container box">
     <h3 align="center">Success Page</h3>
     <br/>
-    @if (isset (\Illuminate\Support\Facades\Auth::user()->email))
         <div class="alert alert-success succes-block">
             <!--Content-->
-            <strong> Welcome {{\Illuminate\Support\Facades\Auth::user()->email}}</strong>
+            <strong> Welcome </strong>
             <br/>
             <a href="{{ url('/main/logout') }}">Logout</a>
         </div>
-        @else
-        <script>window.location = "/main";</script>
-    @endif
 
 </div>
 </body>
