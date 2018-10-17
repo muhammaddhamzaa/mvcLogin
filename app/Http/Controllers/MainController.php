@@ -3,14 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use DemeterChain\Main;
 use Dotenv\Exception\ValidationException;
 use App\Http\Controllers\SugarController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Validator;
 use Illuminate\Support\Facades\Auth;
 
 class MainController extends Controller
 {
+    public $instance_url = "http://127.0.0.1/SugarPro-Full-8.0.0/rest/v10";
+
     /**
      * redirects to login view
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
@@ -34,13 +38,12 @@ class MainController extends Controller
 
         ]);
 
-        $instance_url = "http://127.0.0.1/SugarPro-Full-8.0.0/rest/v10";
+
         $username = $request->get('username');
         $password = $request->get('password');
 
         //Login - POST /oauth2/token
-        $auth_url = $instance_url . "/oauth2/token";
-
+        $auth_url = $this->instance_url . "/oauth2/token";
 
 
         $oauth2_token_arguments = array(
@@ -75,11 +78,58 @@ class MainController extends Controller
 
 
         if (array_key_exists("access_token", json_decode($oauth2_token_response))) { // if authentication successful
+            $oauth2_token_response_obj = json_decode($oauth2_token_response);
+            $request->session()->put('token', $oauth2_token_response_obj->access_token);
             return redirect('main/successlogin');
 
         } else {
             return back()->with('error', 'Wrong Login Details!');
         }
+    }
+
+    function listleads()
+    {
+        $token = Session::get('token');
+        $filter_url = $this->instance_url . "/Leads";
+
+
+        $filter_request = curl_init($filter_url);
+        curl_setopt($filter_request, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
+        curl_setopt($filter_request, CURLOPT_HEADER, false);
+        curl_setopt($filter_request, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($filter_request, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($filter_request, CURLOPT_FOLLOWLOCATION, 0);
+        curl_setopt($filter_request, CURLOPT_HTTPHEADER, array(
+            "Content-Type: application/json",
+            "oauth-token: {$token}"
+        ));
+
+//execute request
+
+        $filter_response = curl_exec($filter_request);
+
+//decode json
+
+        $filtered_data=array();
+
+        $filter_response_obj = json_decode($filter_response, true);
+        $i=0;
+        foreach ($filter_response_obj['records'] as $record)
+        {
+            $filtered_data[$i]['name'] = $record['name'];
+            $filtered_data[$i]['status'] = $record['status'];
+            $filtered_data[$i]['account_name'] = $record['account_name'];
+            $filtered_data[$i]['phone_work'] = $record['phone_work'];
+            $filtered_data[$i]['email'] = $record['email'][0]["email_address"];
+            $filtered_data[$i]['user'] = $record['assigned_user_name'];
+            $filtered_data[$i]['date_entered'] = $record['date_entered'];
+            $filtered_data[$i]['date_modified'] = $record['date_modified'];
+
+
+            $i++;
+        }
+
+        Session::put('leadsdata', $filtered_data);
     }
 
     /**
@@ -91,6 +141,12 @@ class MainController extends Controller
         return view('successlogin');
     }
 
+    function leadspage()
+    {
+        $this->listleads();
+        return view('leadspage');
+    }
+
     /**
      * Logout: redirects to main page
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -100,4 +156,6 @@ class MainController extends Controller
         Auth::logout();
         return redirect('main');
     }
+
+
 }

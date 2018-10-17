@@ -16,6 +16,16 @@
 </head>
 <body>
 <br/>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Hello User!</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li><a href="{{url("/main/leadspage")}}">Leads</a></li>
+        </ul>
+    </div>
+</nav>
 <div class="container box">
     <h3 align="center">Success Page</h3>
     <br/>
