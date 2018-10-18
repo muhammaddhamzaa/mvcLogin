@@ -23,6 +23,7 @@
         </div>
         <ul class="nav navbar-nav">
             <li class="active"><a href="#">Leads</a></li>
+            <li><a href="{{url('/main/successlogin')}}">Home</a></li>
         </ul>
     </div>
 </nav>

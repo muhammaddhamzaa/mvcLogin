@@ -23,6 +23,7 @@
         </div>
         <ul class="nav navbar-nav">
             <li><a href="{{url("/main/leadspage")}}">Leads</a></li>
+            <li class="active"><a href="#">Home</a></li>
         </ul>
     </div>
 </nav>
